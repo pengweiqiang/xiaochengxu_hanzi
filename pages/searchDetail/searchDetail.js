@@ -20,6 +20,8 @@ Page({
         // success
         hideToast();
         console.log(res.data.result);
+        var pinyins = res.data.result.py.split(',');
+        res.data.result.pinyins = pinyins;
         that.setData({
             item:res.data.result
         })
@@ -27,6 +29,36 @@ Page({
       fail: function() {
         // fail
         hideToast();
+      },
+      complete: function() {
+        // complete
+      }
+    })
+  },
+  morePyTap:function(e){
+    var py = e.currentTarget.id;
+    wx.navigateTo({
+      url: '../../pages/detail/detail?key='+py+'&type=pinyin',
+      success: function(res){
+        // success
+      },
+      fail: function() {
+        // fail
+      },
+      complete: function() {
+        // complete
+      }
+    })
+  },
+  morebushouTap:function(e){
+    var py = e.currentTarget.id;
+    wx.navigateTo({
+      url: '../../pages/detail/detail?key='+py+'&type=bushou',
+      success: function(res){
+        // success
+      },
+      fail: function() {
+        // fail
       },
       complete: function() {
         // complete
@@ -62,13 +94,14 @@ function hideToast(){
   wx.hideToast();
 }
 function showModal(){
+  var that = this;
   wx.showModal({
           title: '加载失败',
           content: '网络连接失败，稍后重试！',
           confirmText:'点击重试',
           success: function(res) {
             if (res.confirm) {
-              this();
+              that.onLoad();
             }
           }
         })

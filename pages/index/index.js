@@ -44,13 +44,16 @@ Page({
         console.log(res.data);
         var errorCode = res.data.error_code;
         if(errorCode == 0){
-          if(wordLength==1){
+          if(wordLength==1){//拼音
+          var pinyins = res.data.result.py.split(',');
+          res.data.result.pinyins = pinyins;
+          console.log('after '+res.data.result);
             that.setData({
                 item:res.data.result,
                 showDetail:true,
                 showChengyuDetail:false,
               });
-          }else {
+          }else {//成语
             console.log(res.data.result);
             res.data.result.zi=that.data.inputValue;
             that.setData({
@@ -76,12 +79,12 @@ Page({
         // fail
         hideToast();
         wx.showModal({
-          title: '加载失败'+e,
+          title: '加载失败',
           content: '网络连接失败，稍后重试！',
           confirmText:'点击重试',
           success: function(res) {
             if (res.confirm) {
-              this();
+              that.search();
             }
           }
         })
@@ -97,6 +100,36 @@ Page({
     // this.setData({
     //   inputValue:e.detail.value
     // })
+  },
+  morePyTap:function(e){
+    var py = e.currentTarget.id;
+    wx.navigateTo({
+      url: '../../pages/detail/detail?key='+py+'&type=pinyin',
+      success: function(res){
+        // success
+      },
+      fail: function() {
+        // fail
+      },
+      complete: function() {
+        // complete
+      }
+    })
+  },
+  morebushouTap:function(e){
+    var py = e.currentTarget.id;
+    wx.navigateTo({
+      url: '../../pages/detail/detail?key='+py+'&type=bushou',
+      success: function(res){
+        // success
+      },
+      fail: function() {
+        // fail
+      },
+      complete: function() {
+        // complete
+      }
+    })
   },
   onLoad: function () {
     console.log('onLoad')

@@ -1,7 +1,7 @@
 var app = getApp();
 Page({
   data:{
-      list:{},
+      list:[],
       word:'',
       page:1,
       searchType:''
@@ -27,8 +27,11 @@ Page({
     // 页面关闭
   },
   pullDownRefresh: function( e ) {
-    console.log( "下拉刷新...." )
-    this.onLoad()
+    console.log( "下拉刷新...." );
+    this.setData( {
+      page: 1
+    })
+    this.loadData();
   },
 
   pullUpLoad: function( e ) {
@@ -36,7 +39,7 @@ Page({
       page: this.data.page + 1
     })
 
-    console.log( "上拉拉加载更多...." + this.data.page )
+    console.log( "上拉拉加载更多...." + this.data.page );
 
     this.loadData();
   },
@@ -78,15 +81,39 @@ Page({
       success: function(res){
         // success
         hideToast();
-        console.log(res.data.result.list);
-        var newList = that.data.list.push(res.data.result.list);
-        that.setData({
-            list:newList
-        })
+        if(res.data.error_code==0){
+          console.log(that.data.list.length+" added "+res.data.result.list.length);
+          var newList;
+          if(page >1){
+            newList = that.data.list.concat(res.data.result.list);
+          }else {
+            newList = res.data.result.list;
+          }
+          
+          console.log(newList);
+          console.log("new length "+newList.length);
+          that.setData({
+              list:newList
+          })
+        }else{
+          if(page >1){
+            showToast('没有更多了');
+          }else{
+            showToast(res.data.reason);
+          }
+          
+        }
         
       },
       fail: function() {
+        var page = that.data.page;
+        if(page > 1){
+          page --;
+        }
         // fail
+        that.setData({
+           page:page
+        })
         hideToast();
       },
       complete: function() {
@@ -96,6 +123,7 @@ Page({
   }
 
 })
+
 function showToast(toastTip){
   wx.showToast({
     title: toastTip,
@@ -108,13 +136,14 @@ function hideToast(){
   wx.hideToast();
 }
 function showModal(){
+  var that = this;
   wx.showModal({
           title: '加载失败',
           content: '网络连接失败，稍后重试！',
           confirmText:'点击重试',
           success: function(res) {
             if (res.confirm) {
-              this();
+              
             }
           }
         })
